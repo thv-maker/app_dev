@@ -2,5 +2,12 @@ pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
 extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
 rootProject.name = 'Deguzman'
+
+// manual includes to work around path resolution issues on Windows drives
 include ':app'
+
+// explicitly configure react-native-screens path to avoid incorrect C:\Users\Admin prefix
+include ':react-native-screens'
+project(':react-native-screens').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-screens/android')
+
 includeBuild('../node_modules/@react-native/gradle-plugin')
