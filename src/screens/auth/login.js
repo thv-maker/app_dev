@@ -1,122 +1,171 @@
 import { useEffect, useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
-
+import { Alert, Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import CustomButton from '../../components/CustomButton';
-import CustomTextInput from '../../components/CustomTextInput';
-import { ROUTES } from '../../utils';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../../app/reducers/auth';
+import { ROUTES } from '../../utils';
 
 const Login = () => {
-  // GETTER //SETTER
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const { isLoading, isError, data, errorMessage } = useSelector(state => state.auth);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const { isLoading, isError, errorMessage, data } = useSelector(state => state.auth);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (isError) {
-      Alert.alert('Login failed', errorMessage || 'Please check your credentials and try again.');
+      Alert.alert('Login failed', errorMessage || 'Please check your credentials.');
     }
   }, [isError, errorMessage]);
 
   useEffect(() => {
     if (data) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: ROUTES.HOME }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: ROUTES.HOME }] });
     }
   }, [data, navigation]);
 
-  //   useEffect(() => {}, [email, password]);
-
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-     
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <CustomTextInput
-          label={'Email'}
-          placeholder={'Email'}
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.title}>Carpe Diem</Text>
+        <Text style={styles.subtitle}>Coffee Shop</Text>
+
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#a0856c"
           value={email}
-          onChangeText={val => setEmail(val)}
-          containerStyle={{
-            width: '100%',
-            marginBottom: 15,
-          }}
-          labelStyle={{
-            fontSize: 20,
-            fontWeight: '500',
-          }}
-          textStyle={{
-            fontSize: 20,
-          }}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
-        <CustomTextInput
-          label={'Password'}
-          placeholder={'Password'}
-          value={password}
-          onChangeText={val => setPassword(val)}
-          containerStyle={{
-            width: '100%',
-          }}
-          labelStyle={{
-            fontSize: 20,
-            fontWeight: '500',
-          }}
-          textStyle={{
-            fontSize: 20,
-          }}
-        />
-      </View>
+        <Text style={styles.label}>Password</Text>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.inputFlex}
+            placeholder="Password"
+            placeholderTextColor="#a0856c"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <CustomButton
-        label={'LOGIN'}
-        containerStyle={{
-          marginVertical: 20,
-          width: '80%',
-          backgroundColor: 'blue',
-          borderRadius: 10,
-        }}
-        textStyle={{
-          color: '#ffffff',
-          textAlign: 'center',
-          fontWeight: '800',
-          fontSize: 20,
-        }}
-        loading={isLoading}
-        onPress={async () => {
-          // await userLogin({
-          //   email: email,
-          //   password: password,
-          // });
-
-          dispatch(
-            userLogin({
-              email: email,
-              password: password,
-            }),
-          );
-        }}
-      />
-
-      <View style={{ flexDirection: 'row' }}>
-        <Text>Not register yet?</Text>
         <TouchableOpacity
-          style={{ marginLeft: 5 }}
-          onPress={() => navigation.navigate(ROUTES.REGISTER)}
+          style={styles.button}
+          onPress={() => dispatch(userLogin({ email, password }))}
+          disabled={isLoading}
         >
-          <Text style={{ color: 'red', fontWeight: '800' }}>Register</Text>
+          <Text style={styles.buttonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
         </TouchableOpacity>
+
+        <View style={styles.registerRow}>
+          <Text style={styles.registerText}>Not registered yet? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.REGISTER)}>
+            <Text style={styles.registerLink}>Register</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f0eb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 30,
+    width: '85%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#6b3f2a',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#a0856c',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6b3f2a',
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d4b8a8',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    color: '#3d2314',
+    marginBottom: 15,
+    backgroundColor: '#fdf8f5',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#d4b8a8',
+    borderRadius: 8,
+    backgroundColor: '#fdf8f5',
+    marginBottom: 15,
+    paddingRight: 10,
+  },
+  inputFlex: {
+    flex: 1,
+    padding: 12,
+    fontSize: 15,
+    color: '#3d2314',
+  },
+  eyeIcon: {
+    fontSize: 18,
+  },
+  button: {
+    backgroundColor: '#7c5c47',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  registerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  registerText: {
+    color: '#888',
+    fontSize: 13,
+  },
+  registerLink: {
+    color: '#7c5c47',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+});
 
 export default Login;

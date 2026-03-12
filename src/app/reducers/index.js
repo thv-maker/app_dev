@@ -16,7 +16,7 @@ const rootPersistConfig = {
 const authPersistConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  blacklist: [],
+  blacklist: ['data'],
 };
 
 // Combine Reducers
