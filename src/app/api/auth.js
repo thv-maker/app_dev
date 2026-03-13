@@ -1,6 +1,6 @@
 // Use global.API_BASE_URL if set (e.g., from App.js) so the app can point to different backends.
 // Default assumes Android emulator talking to localhost on port 8000.
-const BASE_URL = 'http://192.168.239.124:8000/api';
+const BASE_URL = 'http://192.168.55.124:8000/api';
 const options = {
   headers: {
     Accept: 'application/json',
